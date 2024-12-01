@@ -2,9 +2,10 @@ from fastapi import HTTPException
 from fastapi import FastAPI
 from pydantic import BaseModel
 from gpt import generate_response
-from database import connect_to_mongo, close_mongo_connection, mongo
+from database import MongoDB
 from models import create_user, get_user, update_user, delete_user, insert_gpt_response, insert_answer
 app = FastAPI()
+mongo = MongoDB()
 
 # 요청 바디 모델 정의
 class PromptRequest(BaseModel):
@@ -30,11 +31,11 @@ class Answer(BaseModel): #사용자가 선택한 응답
 # MongoDB 연결 설정
 @app.on_event("startup")
 async def startup_event():
-    await connect_to_mongo()
+    await mongo.connect_to_mongo()
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await close_mongo_connection()
+    await mongo.close_mongo_connection()
 
 # OPENAI API 
 # prompt 가 여러개일텐데 그에 따라 gpt_reponse 에 insert 하는 함수 만들건지 
